@@ -3,8 +3,9 @@
 #include <stdlib.h>
 #include <time.h>
 #include <Windows.h>
+#include <vector>
+#include <algorithm>
 
-int length;
 int width = 30, height = 10;
 bool running = true; // is game running
 
@@ -20,14 +21,32 @@ struct Point
     {
         return (a.x == x && a.y == y);
     }
+
+    bool operator==(const std::vector<Point>& a) const
+    {
+        for(Point i : a) 
+        {
+            if (&i == this)
+                return true;
+        }      
+    }
+
+    Point& operator=(const Point& a)
+    {
+        x = a.x;
+        y = a.y;
+        return *this;
+    }
 };
 
 Point headPos;
+Point tailPos;
 Point foodPos;
+std::vector<Point> bodyPositions;
 
-void setCursorPosition(int x, int y)
+void setCursorPosition(Point point)
 {
-    COORD position = {(SHORT)x, (SHORT)y};
+    COORD position = {(SHORT)point.x, (SHORT)point.y};
     SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), position); // Set cursor position
 }
 
@@ -58,6 +77,7 @@ void registerKeyPress()
 
 void moveCharacter()
 {
+    tailPos = headPos;
     switch(dir)
     {
     case Up:
@@ -74,19 +94,49 @@ void moveCharacter()
         break;
     }
     if (headPos.x < 1 || headPos.x > width - 2 || headPos.y < 1 || headPos.y > height)
+    {
         running = false;
+    }
+    // else if (headPos == foodPos) // Food eaten
+    // {
+    //     do // Make sure food is placed in the body
+    //     {
+    //         foodPos.x = rand() % (width - 2) + 1;
+    //         foodPos.y = rand() % height + 1;
+    //     } while(foodPos == bodyPositions); 
+
+    //     setCursorPosition(foodPos);
+    //     std::cout << "@";
+    //     bodyPositions.push_back(headPos);
+    //     return;
+    // }
+
+    // if (bodyPositions.size() > 0)
+    // {
+    //     tailPos = bodyPositions.back();
+    //     for(std::vector<Point>::size_type i = 0; i != bodyPositions.size(); i++) {
+    //         bodyPositions[i] = bodyPositions[i - 1];
+    //     }
+    // }
 }
 
 void drawGame()
 {
-    // setCursorPosition(prevX, prevY); // clear previous
-    // std::cout << " ";
-    // setCursorPosition(x, y); 
-    // std::cout << "O";
+    setCursorPosition(tailPos); 
+    std::cout << " ";
+    // for(std::vector<Point>::size_type i = 0; i != bodyPositions.size(); i++) {
+    //     setCursorPosition(bodyPositions[i]); 
+    //     std::cout << "O";
+    // }
+    setCursorPosition(headPos); 
+    std::cout << "O";
 }
 
 void setup()
 {
+    headPos.x = width / 2;
+    headPos.y = height / 2;
+
     system("cls"); //Clear screen
 
     // Start Draw walls
@@ -115,15 +165,15 @@ void setup()
 
     // END Draw walls
     
-    foodPos.x = rand() % width;
-    foodPos.y = rand() % height;
+    foodPos.x = rand() % (width + 1) - 1;
+    foodPos.y = rand() % height + 1;
 
     if (foodPos == headPos)
     {
         foodPos.x--;
     }
 
-    setCursorPosition(foodPos.x, foodPos.y);
+    setCursorPosition(foodPos);
     std::cout << "@";
 }
 
@@ -137,16 +187,13 @@ int main()
     cursorInfo.bVisible = false;            // Set visible to false
     SetConsoleCursorInfo(out, &cursorInfo); // Set current info to updated info
 
-    headPos.x = width / 2;
-    headPos.y = height / 2;
-
     setup();
 
     while(running)
     {
         registerKeyPress();
-        //moveCharacter();
+        moveCharacter();
         drawGame();
-        Sleep(100);
+        Sleep(200);
     }
 }
