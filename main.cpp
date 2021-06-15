@@ -6,7 +6,10 @@
 
 int x, y, prevX, prevY;
 int width = 30, height = 10;
-bool running = true; // is game running 
+bool running = true; // is game running
+
+enum direction {Up, Down, Left, Right};
+direction dir; 
 
 void setCursorPosition(int x, int y)
 {
@@ -16,23 +19,21 @@ void setCursorPosition(int x, int y)
 
 void registerKeyPress()
 {
-    prevX = x;
-    prevY = y;
     if(_kbhit()) // If key hit
     {
         switch(_getch()) // switch on key
         {
         case 'w': //up
-            y--; // minus for up the screen
-            break;
-        case 'a': //left
-            x--;
+            dir = Up;
             break;
         case 's': //down
-            y++;
+            dir = Down;
+            break;
+        case 'a': //left
+            dir = Left;
             break;
         case 'd': //right
-            x++;
+            dir = Right;
             break;
         default: // Anything else pressed
             running = false;
@@ -41,17 +42,38 @@ void registerKeyPress()
     }
 }
 
+void moveCharacter()
+{
+    prevX = x;
+    prevY = y;
+    switch(dir)
+    {
+    case Up:
+        y--; //minus for up the screen
+        break;
+    case Down:
+        y++;
+        break;
+    case Left:
+        x--;
+        break;
+    case Right:
+        x++;
+        break;
+    }
+    if (x < 1 || x > width - 2 || y < 1 || y > height)
+        running = false;
+}
+
 void drawGame()
 {
-    if (prevX == x && prevY == y) // Dont redraw
-        return;
-    setCursorPosition(prevX, prevY); // Clear previous position
-    std::cout << " "; 
-    setCursorPosition(x, y); // Print x at line 1 index 1
+    setCursorPosition(prevX, prevY); // clear previous
+    std::cout << " ";
+    setCursorPosition(x, y); 
     std::cout << "O";
 }
 
-void drawWalls(int width, int height)
+void setup()
 {
     system("cls"); //Clear screen
 
@@ -91,10 +113,13 @@ int main()
     x = width / 2;
     y = height / 2;
 
-    drawWalls(width, height);
+    setup();
+
     while(running)
     {
         registerKeyPress();
+        moveCharacter();
         drawGame();
+        Sleep(100);
     }
 }
