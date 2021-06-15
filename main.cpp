@@ -2,9 +2,17 @@
 #include <conio.h>
 #include <stdlib.h>
 #include <time.h>
+#include <Windows.h>
 
 int x, y;
+int width = 30, height = 10;
 bool running = true; // is game running 
+
+void setCursorPosition(int x, int y)
+{
+    COORD position = {(SHORT)x, (SHORT)y};
+    SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), position); // Set cursor position
+}
 
 void registerKeyPress()
 {
@@ -33,13 +41,53 @@ void registerKeyPress()
 
 void drawGame()
 {
-    system("CLS");
-    std::cout << x << std::endl;
-    std::cout << y << std::endl;
+    setCursorPosition(1, 1); // Print x at line 1 index 1
+    std::cout << x;
+    setCursorPosition(1, 2); // Print y at line 2 index 1
+    std::cout << y;
+}
+
+void drawWalls(int width, int height)
+{
+    system("cls"); //Clear screen
+
+    for(int i = 0; i < width; i++)
+    {
+        std::cout << "#";
+    }
+
+    std::cout << std::endl;
+
+    for(int i = 0; i < height; i++)
+    {
+        std::cout << "#";
+        for (int j = 0; j < width - 2; ++j) // minus 2 for the 2 wall places
+        {
+            std::cout << " ";
+        }
+        std::cout << "#" << std::endl;
+    }
+
+    for(int i = 0; i < width; i++)
+    {
+        std::cout << "#";
+    }
 }
 
 int main()
 {
+    // Hide cursor 
+    // Taken from : https://stackoverflow.com/questions/18028808/remove-blinking-underscore-on-console-cmd-prompt
+    HANDLE out = GetStdHandle(STD_OUTPUT_HANDLE);
+    CONSOLE_CURSOR_INFO cursorInfo;
+    GetConsoleCursorInfo(out, &cursorInfo); // Get cursor info
+    cursorInfo.bVisible = false;            // Set visible to false
+    SetConsoleCursorInfo(out, &cursorInfo); // Set current info to updated info
+
+    x = width / 2;
+    y = height / 2;
+
+    drawWalls(width, height);
     while(running)
     {
         registerKeyPress();
