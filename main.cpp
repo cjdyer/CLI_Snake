@@ -4,7 +4,7 @@
 #include <time.h>
 #include <Windows.h>
 
-int x, y;
+int x, y, prevX, prevY;
 int width = 30, height = 10;
 bool running = true; // is game running 
 
@@ -16,18 +16,20 @@ void setCursorPosition(int x, int y)
 
 void registerKeyPress()
 {
+    prevX = x;
+    prevY = y;
     if(_kbhit()) // If key hit
     {
         switch(_getch()) // switch on key
         {
         case 'w': //up
-            y++;
+            y--; // minus for up the screen
             break;
         case 'a': //left
             x--;
             break;
         case 's': //down
-            y--;
+            y++;
             break;
         case 'd': //right
             x++;
@@ -41,10 +43,12 @@ void registerKeyPress()
 
 void drawGame()
 {
-    setCursorPosition(1, 1); // Print x at line 1 index 1
-    std::cout << x;
-    setCursorPosition(1, 2); // Print y at line 2 index 1
-    std::cout << y;
+    if (prevX == x && prevY == y) // Dont redraw
+        return;
+    setCursorPosition(prevX, prevY); // Clear previous position
+    std::cout << " "; 
+    setCursorPosition(x, y); // Print x at line 1 index 1
+    std::cout << "O";
 }
 
 void drawWalls(int width, int height)
