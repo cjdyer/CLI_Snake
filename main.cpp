@@ -4,12 +4,26 @@
 #include <time.h>
 #include <Windows.h>
 
-int x, y, prevX, prevY;
+int length;
 int width = 30, height = 10;
 bool running = true; // is game running
 
 enum direction {Up, Down, Left, Right};
 direction dir; 
+
+struct Point
+{
+    int x;
+    int y;
+
+    bool operator==(const Point& a) const
+    {
+        return (a.x == x && a.y == y);
+    }
+};
+
+Point headPos;
+Point foodPos;
 
 void setCursorPosition(int x, int y)
 {
@@ -44,38 +58,38 @@ void registerKeyPress()
 
 void moveCharacter()
 {
-    prevX = x;
-    prevY = y;
     switch(dir)
     {
     case Up:
-        y--; //minus for up the screen
+        headPos.y--; //minus for up the screen
         break;
     case Down:
-        y++;
+        headPos.y++;
         break;
     case Left:
-        x--;
+        headPos.x--;
         break;
     case Right:
-        x++;
+        headPos.x++;
         break;
     }
-    if (x < 1 || x > width - 2 || y < 1 || y > height)
+    if (headPos.x < 1 || headPos.x > width - 2 || headPos.y < 1 || headPos.y > height)
         running = false;
 }
 
 void drawGame()
 {
-    setCursorPosition(prevX, prevY); // clear previous
-    std::cout << " ";
-    setCursorPosition(x, y); 
-    std::cout << "O";
+    // setCursorPosition(prevX, prevY); // clear previous
+    // std::cout << " ";
+    // setCursorPosition(x, y); 
+    // std::cout << "O";
 }
 
 void setup()
 {
     system("cls"); //Clear screen
+
+    // Start Draw walls
 
     for(int i = 0; i < width; i++)
     {
@@ -98,6 +112,19 @@ void setup()
     {
         std::cout << "#";
     }
+
+    // END Draw walls
+    
+    foodPos.x = rand() % width;
+    foodPos.y = rand() % height;
+
+    if (foodPos == headPos)
+    {
+        foodPos.x--;
+    }
+
+    setCursorPosition(foodPos.x, foodPos.y);
+    std::cout << "@";
 }
 
 int main()
@@ -110,15 +137,15 @@ int main()
     cursorInfo.bVisible = false;            // Set visible to false
     SetConsoleCursorInfo(out, &cursorInfo); // Set current info to updated info
 
-    x = width / 2;
-    y = height / 2;
+    headPos.x = width / 2;
+    headPos.y = height / 2;
 
     setup();
 
     while(running)
     {
         registerKeyPress();
-        moveCharacter();
+        //moveCharacter();
         drawGame();
         Sleep(100);
     }
