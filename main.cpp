@@ -8,6 +8,8 @@
 
 int width = 30, height = 10;
 bool running = true; // is game running
+int length;
+bool addSeg = false;
 
 enum direction {Up, Down, Left, Right};
 direction dir; 
@@ -31,7 +33,7 @@ struct Point
         }      
     }
 
-    Point& operator=(const Point& a)
+    Point operator=(Point a)
     {
         x = a.x;
         y = a.y;
@@ -39,8 +41,6 @@ struct Point
     }
 };
 
-Point headPos;
-Point tailPos;
 Point foodPos;
 std::vector<Point> bodyPositions;
 
@@ -56,86 +56,95 @@ void registerKeyPress()
     {
         switch(_getch()) // switch on key
         {
-        case 'w': //up
-            dir = Up;
-            break;
-        case 's': //down
-            dir = Down;
-            break;
-        case 'a': //left
-            dir = Left;
-            break;
-        case 'd': //right
-            dir = Right;
-            break;
-        default: // Anything else pressed
-            running = false;
-            break;
+            case 'w': //up
+                if (dir != Down || length == 1)
+                    dir = Up;
+                break;
+            case 's': //down
+                if (dir != Up || length == 1)
+                    dir = Down;
+                break;
+            case 'a': //left
+                if (dir != Right || length == 1)
+                    dir = Left;
+                break;
+            case 'd': //right
+                if (dir != Left || length == 1)
+                    dir = Right;
+                break;
+            default: // Anything else pressed
+                for(int i = 0; i < length; i++)
+                {
+                    setCursorPosition({5,i});  
+                    std::cout << bodyPositions[i].x;
+                    setCursorPosition({8,i});  
+                    std::cout << bodyPositions[i].y;
+                }
+                running = false;
+                break;
         }
     }
 }
 
 void moveCharacter()
 {
-    tailPos = headPos;
+    setCursorPosition(bodyPositions[length -1]); 
+    std::cout << " ";
+
+    if (addSeg)
+    {
+        bodyPositions.push_back({bodyPositions[length - 1].x, bodyPositions[length - 1].y}); // TODO: This line appends the last item in bodyPositions
+        length++;                                                                            // But not the tail position.
+        addSeg = false;
+    }
+    else if (length >= 2)
+    {
+        for(int i = 1; i < length; i++)
+        {
+            bodyPositions[i] = bodyPositions[i-1];
+        }
+    }
+
     switch(dir)
     {
     case Up:
-        headPos.y--; //minus for up the screen
+        bodyPositions[0].y--; //minus for up the screen
         break;
     case Down:
-        headPos.y++;
+        bodyPositions[0].y++;
         break;
     case Left:
-        headPos.x--;
+        bodyPositions[0].x--;
         break;
     case Right:
-        headPos.x++;
+        bodyPositions[0].x++;
         break;
     }
-    if (headPos.x < 1 || headPos.x > width - 2 || headPos.y < 1 || headPos.y > height)
+    if (bodyPositions[0].x < 1 || bodyPositions[0].x > width - 2 || bodyPositions[0].y < 1 || bodyPositions[0].y > height)
     {
         running = false;
     }
-    // else if (headPos == foodPos) // Food eaten
-    // {
-    //     do // Make sure food is placed in the body
-    //     {
-    //         foodPos.x = rand() % (width - 2) + 1;
-    //         foodPos.y = rand() % height + 1;
-    //     } while(foodPos == bodyPositions); 
+    else if (bodyPositions[0] == foodPos) // Food eaten
+    {
+        do // Make sure food is placed in the body
+        {
+            foodPos.x = rand() % (width - 2) + 1;
+            foodPos.y = rand() % height + 1;
+        } while(foodPos == bodyPositions); 
 
-    //     setCursorPosition(foodPos);
-    //     std::cout << "@";
-    //     bodyPositions.push_back(headPos);
-    //     return;
-    // }
+        setCursorPosition(foodPos);
+        std::cout << "@";
+        addSeg = true;
+    }
 
-    // if (bodyPositions.size() > 0)
-    // {
-    //     tailPos = bodyPositions.back();
-    //     for(std::vector<Point>::size_type i = 0; i != bodyPositions.size(); i++) {
-    //         bodyPositions[i] = bodyPositions[i - 1];
-    //     }
-    // }
-}
-
-void drawGame()
-{
-    setCursorPosition(tailPos); 
-    std::cout << " ";
-    // for(std::vector<Point>::size_type i = 0; i != bodyPositions.size(); i++) {
-    //     setCursorPosition(bodyPositions[i]); 
-    //     std::cout << "O";
-    // }
-    setCursorPosition(headPos); 
+    setCursorPosition(bodyPositions[0]); 
     std::cout << "O";
 }
 
 void setup()
 {
-    headPos.x = width / 2;
-    headPos.y = height / 2;
+    bodyPositions.push_back({width / 2, height / 2});
+    length = 1;
 
     system("cls"); //Clear screen
 
@@ -168,7 +177,7 @@ void setup()
     foodPos.x = rand() % (width + 1) - 1;
     foodPos.y = rand() % height + 1;
 
-    if (foodPos == headPos)
+    if (foodPos == bodyPositions[0])
     {
         foodPos.x--;
     }
@@ -193,7 +202,7 @@ int main()
     {
         registerKeyPress();
         moveCharacter();
-        drawGame();
         Sleep(200);
     }
+    while(true);
 }
