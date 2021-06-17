@@ -8,7 +8,6 @@
 
 int width = 30, height = 10;
 bool running = true; // is game running
-int length;
 bool addSeg = false;
 
 enum direction {Up, Down, Left, Right};
@@ -19,29 +18,28 @@ struct Point
     int x;
     int y;
 
-    bool operator==(const Point& a) const
+    bool operator==(const Point& point)
     {
-        return (a.x == x && a.y == y);
+        return (point.x == x && point.y == y);
     }
 
-    bool operator==(const std::vector<Point>& a) const
+    bool operator==(const std::vector<Point>& points)
     {
-        for(Point i : a) 
+        for (int i = 0; i < points.size(); i++)
         {
-            if (&i == this)
+            if(points[i].x == x && points[i].y == y)
                 return true;
-        }      
-    }
-
-    Point operator=(Point a)
-    {
-        x = a.x;
-        y = a.y;
-        return *this;
+        }
+        return false;
     }
 };
 
-Point foodPos;
+std::ostream& operator<<(std::ostream& out, const Point& point)
+{
+    return out << point.x << " " << point.y;
+}
+
+Point foodPos = Point();
 std::vector<Point> bodyPositions;
 
 void setCursorPosition(Point point)
@@ -57,28 +55,26 @@ void registerKeyPress()
         switch(_getch()) // switch on key
         {
             case 'w': //up
-                if (dir != Down || length == 1)
+                if (dir != Down || bodyPositions.size() == 1)
                     dir = Up;
                 break;
             case 's': //down
-                if (dir != Up || length == 1)
+                if (dir != Up || bodyPositions.size() == 1)
                     dir = Down;
                 break;
             case 'a': //left
-                if (dir != Right || length == 1)
+                if (dir != Right || bodyPositions.size() == 1)
                     dir = Left;
                 break;
             case 'd': //right
-                if (dir != Left || length == 1)
+                if (dir != Left || bodyPositions.size() == 1)
                     dir = Right;
                 break;
             default: // Anything else pressed
-                for(int i = 0; i < length; i++)
+                for (int i = 0; i < bodyPositions.size(); i++)
                 {
-                    setCursorPosition({5,i});  
-                    std::cout << bodyPositions[i].x;
-                    setCursorPosition({8,i});  
-                    std::cout << bodyPositions[i].y;
+                    setCursorPosition({5, i});
+                    std::cout << bodyPositions[i].x << " " << bodyPositions[i].y;
                 }
                 running = false;
                 break;
@@ -88,21 +84,20 @@ void registerKeyPress()
 
 void moveCharacter()
 {
-    setCursorPosition(bodyPositions[length -1]); 
-    std::cout << " ";
+    Point tailPos = {bodyPositions.back().x, bodyPositions.back().y};
 
-    if (addSeg)
+    setCursorPosition({0, 0});
+    std::cout << tailPos;
+
+    for (Point point : bodyPositions)
     {
-        bodyPositions.push_back({bodyPositions[length - 1].x, bodyPositions[length - 1].y}); // TODO: This line appends the last item in bodyPositions
-        length++;                                                                            // But not the tail position.
-        addSeg = false;
+        setCursorPosition(point); 
+        std::cout << " ";
     }
-    else if (length >= 2)
+
+    for(int i = 1; i < bodyPositions.size(); i++)
     {
-        for(int i = 1; i < length; i++)
-        {
-            bodyPositions[i] = bodyPositions[i-1];
-        }
+        bodyPositions[i] = {bodyPositions[i-1].x, bodyPositions[i-1].y};
     }
 
     switch(dir)
@@ -120,6 +115,7 @@ void moveCharacter()
         bodyPositions[0].x++;
         break;
     }
+
     if (bodyPositions[0].x < 1 || bodyPositions[0].x > width - 2 || bodyPositions[0].y < 1 || bodyPositions[0].y > height)
     {
         running = false;
@@ -134,17 +130,19 @@ void moveCharacter()
 
         setCursorPosition(foodPos);
         std::cout << "@";
-        addSeg = true;
+        bodyPositions.push_back(tailPos);
     }
 
-    setCursorPosition(bodyPositions[0]); 
-    std::cout << "O";
+    for (Point point : bodyPositions)
+    {
+        setCursorPosition(point); 
+        std::cout << "O";
+    }
 }
 
 void setup()
 {
     bodyPositions.push_back({width / 2, height / 2});
-    length = 1;
 
     system("cls"); //Clear screen
 
@@ -204,5 +202,4 @@ int main()
         moveCharacter();
         Sleep(200);
     }
-    while(true);
 }
