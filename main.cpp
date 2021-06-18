@@ -71,11 +71,6 @@ void registerKeyPress()
                     dir = Right;
                 break;
             default: // Anything else pressed
-                for (int i = 0; i < bodyPositions.size(); i++)
-                {
-                    setCursorPosition({5, i});
-                    std::cout << bodyPositions[i].x << " " << bodyPositions[i].y;
-                }
                 running = false;
                 break;
         }
@@ -84,20 +79,18 @@ void registerKeyPress()
 
 void moveCharacter()
 {
-    Point tailPos = {bodyPositions.back().x, bodyPositions.back().y};
+    Point tailPos = {bodyPositions.front().x, bodyPositions.front().y};
 
-    setCursorPosition({0, 0});
-    std::cout << tailPos;
-
-    for (Point point : bodyPositions)
+    if (addSeg)
     {
-        setCursorPosition(point); 
-        std::cout << " ";
+        bodyPositions.push_back({bodyPositions.back().x, bodyPositions.back().y});
+        addSeg = false;
     }
 
-    for(int i = 1; i < bodyPositions.size(); i++)
+    for (int i = 0; i < bodyPositions.size(); i++)
     {
-        bodyPositions[i] = {bodyPositions[i-1].x, bodyPositions[i-1].y};
+        setCursorPosition(bodyPositions[i]); 
+        std::cout << " ";
     }
 
     switch(dir)
@@ -115,6 +108,14 @@ void moveCharacter()
         bodyPositions[0].x++;
         break;
     }
+    
+    for(int i = bodyPositions.size(); i > 1; i--)
+    {
+        if (i == 1)
+            bodyPositions[i] = tailPos;
+        else
+            bodyPositions[i] = {bodyPositions[i-1].x, bodyPositions[i-1].y};
+    }
 
     if (bodyPositions[0].x < 1 || bodyPositions[0].x > width - 2 || bodyPositions[0].y < 1 || bodyPositions[0].y > height)
     {
@@ -130,7 +131,7 @@ void moveCharacter()
 
         setCursorPosition(foodPos);
         std::cout << "@";
-        bodyPositions.push_back(tailPos);
+        addSeg = true;
     }
 
     for (Point point : bodyPositions)
@@ -201,5 +202,10 @@ int main()
         registerKeyPress();
         moveCharacter();
         Sleep(200);
+    }
+    for (int i = 0; i < bodyPositions.size(); i++)
+    {
+        setCursorPosition({31, i});
+        std::cout << bodyPositions[i].x << " " << bodyPositions[i].y;
     }
 }
