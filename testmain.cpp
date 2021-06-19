@@ -3,6 +3,8 @@
 #include <stdlib.h>
 #include <time.h>
 #include <Windows.h>
+#include <thread>
+#include <chrono>
 #include <vector>
 #include <algorithm>
 
@@ -38,8 +40,6 @@ struct Point
         return out << x << " " << y;
     }
 };
-
-
 
 Point foodPos;
 std::vector<Point> bodyPositions;
@@ -210,9 +210,21 @@ int main()
     while(running)
     {
         clearGame();
+
+        auto start = std::chrono::system_clock::now();
+        
         registerKeyPress();
         moveCharacter();
+
         drawGame();
-        Sleep(200);
+    
+        std::this_thread::sleep_until(start + std::chrono::milliseconds(200));
+        auto end = std::chrono::system_clock::now();
+        std::chrono::duration<double, std::milli> diff = end-start;
+        setCursorPosition({31, 0});
+        std::cout << diff.count();
     }
+
+    cursorInfo.bVisible = true;            // Set back to true
+    SetConsoleCursorInfo(out, &cursorInfo);
 }

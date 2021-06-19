@@ -215,4 +215,7 @@ int main()
         drawGame();
         Sleep(200);
     }
+
+    cursorInfo.bVisible = true;            // Set back to true after game ends
+    SetConsoleCursorInfo(out, &cursorInfo);
 }
