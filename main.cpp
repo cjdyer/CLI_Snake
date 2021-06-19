@@ -39,7 +39,7 @@ std::ostream& operator<<(std::ostream& out, const Point& point)
     return out << point.x << " " << point.y;
 }
 
-Point foodPos = Point();
+Point foodPos;
 std::vector<Point> bodyPositions;
 
 void setCursorPosition(Point point)
@@ -79,18 +79,12 @@ void registerKeyPress()
 
 void moveCharacter()
 {
-    Point tailPos = {bodyPositions.front().x, bodyPositions.front().y};
+    Point headPos = bodyPositions.front();
 
     if (addSeg)
     {
         bodyPositions.push_back({bodyPositions.back().x, bodyPositions.back().y});
         addSeg = false;
-    }
-
-    for (int i = 0; i < bodyPositions.size(); i++)
-    {
-        setCursorPosition(bodyPositions[i]); 
-        std::cout << " ";
     }
 
     switch(dir)
@@ -108,14 +102,6 @@ void moveCharacter()
         bodyPositions[0].x++;
         break;
     }
-    
-    for(int i = bodyPositions.size(); i > 1; i--)
-    {
-        if (i == 1)
-            bodyPositions[i] = tailPos;
-        else
-            bodyPositions[i] = {bodyPositions[i-1].x, bodyPositions[i-1].y};
-    }
 
     if (bodyPositions[0].x < 1 || bodyPositions[0].x > width - 2 || bodyPositions[0].y < 1 || bodyPositions[0].y > height)
     {
@@ -128,16 +114,35 @@ void moveCharacter()
             foodPos.x = rand() % (width - 2) + 1;
             foodPos.y = rand() % height + 1;
         } while(foodPos == bodyPositions); 
-
-        setCursorPosition(foodPos);
-        std::cout << "@";
-        addSeg = true;
+        addSeg = true;  
     }
 
-    for (Point point : bodyPositions)
+    for (int i = bodyPositions.size() - 1; i > 0; i--)
     {
-        setCursorPosition(point); 
+        if (i == 1)
+            bodyPositions[i] = {headPos.x, headPos.y};
+        else
+            bodyPositions[i] = {bodyPositions[i - 1].x, bodyPositions[i - 1].y};
+    }
+}
+
+void drawGame()
+{
+    for (int i = 0; i < bodyPositions.size(); i++)
+    {
+        setCursorPosition(bodyPositions[i]);
         std::cout << "O";
+    }
+    setCursorPosition(foodPos);
+    std::cout << "@";
+}
+
+void clearGame()
+{
+    for (int i = 0; i < bodyPositions.size(); i++)
+    {
+        setCursorPosition(bodyPositions[i]);
+        std::cout << " ";
     }
 }
 
@@ -180,9 +185,6 @@ void setup()
     {
         foodPos.x--;
     }
-
-    setCursorPosition(foodPos);
-    std::cout << "@";
 }
 
 int main()
@@ -199,13 +201,10 @@ int main()
 
     while(running)
     {
+        clearGame();
         registerKeyPress();
         moveCharacter();
+        drawGame();
         Sleep(200);
-    }
-    for (int i = 0; i < bodyPositions.size(); i++)
-    {
-        setCursorPosition({31, i});
-        std::cout << bodyPositions[i].x << " " << bodyPositions[i].y;
     }
 }
