@@ -11,12 +11,12 @@ public:
 
     void Print() const;
 
-    void Set(const Coords& pos, const Head_Symbol sym);
-    void Set(const Coords& pos, const Body_Symbol sym);
+    void Set(Coords& pos, const Head_Symbol sym);
+    void Set(Coords& pos, const Body_Symbol sym);
 
-    int Get(const Coords& pos) const;
+    int Get(Coords& pos) const;
     
-    void Clear(const Coords& pos);
+    void Clear(Coords& pos);
 
 public:
     static int constexpr Width = X;

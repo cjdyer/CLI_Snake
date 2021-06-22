@@ -2,6 +2,7 @@
 #include "../include/Symbol.h"
 #include "../include/Board.h"
 #include <iostream>
+#include <cstring>
 using std::cout;
 using std::endl;
 
@@ -15,7 +16,6 @@ Board<X, Y>::Board()
             pixelArray[x][y] = "0";
         }
     }
-//    cout << "constructed board of dimension " << width << " by " << height << endl;
 }
 
 template <int X, int Y>
@@ -32,35 +32,31 @@ void Board<X, Y>::Print() const
 }
 
 template <int X, int Y>
-void Board<X, Y>::Set(const Coords& pos, const Head_Symbol sym)
+void Board<X, Y>::Set(Coords& pos, const Head_Symbol sym)
 {
     const char* str = GetSymbol(sym);
-    pixelArray[pos.get(Axis::x)][pos.get(Axis::y)] = str;
-
-//    cout << "set called: " << pos << " to " << str << endl;
+    pixelArray[pos.getX()][pos.getY()] = str;
 }
 
 template <int X, int Y>
-void Board<X, Y>::Set(const Coords& pos, const Body_Symbol sym)
+void Board<X, Y>::Set(Coords& pos, const Body_Symbol sym)
 {
     const char* str = GetSymbol(sym);
-    pixelArray[pos.get(Axis::x)][pos.get(Axis::y)] = str;
-    
-//    cout << "Set : " << pos << " to " << str << endl;
+    pixelArray[pos.getX()][pos.getY()] = str;
 }
 
 template <int X, int Y>
-int Board<X, Y>::Get(const Coords& pos) const
+int Board<X, Y>::Get(Coords& pos) const
 {
-    const char * str = pixelArray[pos.get(Axis::x)][pos.get(Axis::y)];
+    const char* str = pixelArray[pos.getX()][pos.getY()];
     
-    if (!(strcmp(str, "^") || strcmp(str, "«") || strcmp(str, "»") || strcmp(str, "¥")))
+    if (!(str == "^" || str == "«" || str == "»" || str == "¥"))
         return 1;
     
-    else if (!(strcmp(str, "╔") || strcmp(str, "╗") || strcmp(str, "╚") || strcmp(str, "╝") || strcmp(str, "═") || strcmp(str, "║")))
+    else if (!(str == "╔" || str == "╗" || str == "╚" || str == "╝" || str == "═" || str == "║"))
         return 2;
     
-    else if (!strcmp(str, "@"))
+    else if (str != "@")
         return 3;
     
     else
@@ -68,9 +64,7 @@ int Board<X, Y>::Get(const Coords& pos) const
 }
 
 template <int X, int Y>
-void Board<X, Y>::Clear(const Coords& pos)
+void Board<X, Y>::Clear(Coords& pos)
 {
-    pixelArray[pos.get(Axis::x)][pos.get(Axis::y)] = "0";
-    
-    //    cout << "Cleared: " << pos << endl;
+    pixelArray[pos.getX()][pos.getY()] = "0";
 }

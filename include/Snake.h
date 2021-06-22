@@ -14,20 +14,20 @@ public:
     
     void move(const Direction& dir, const Direction& oldDir);
     
-    const unsigned int Length() const;
+    const unsigned int Length();
     
-    const Coords& HeadCoords() const;
-    const unsigned int HeadCoord(const Axis& ax) const;
+    Coords& HeadCoords();
+    const unsigned int HeadCoord(const Axis& ax);
 
-    const Coords& OldHeadCoords() const;
-    const unsigned int OldHeadCoord(const Axis& ax) const;
+    Coords& OldHeadCoords();
+    const unsigned int OldHeadCoord(const Axis& ax);
     
-    const Head_Symbol& HeadSymbol() const;
-    const Body_Symbol& BodySymbol() const;
+    const Head_Symbol& HeadSymbol();
+    const Body_Symbol& BodySymbol();
 
-    const vector<Coords>& BodyArray() const;
+    const vector<Coords>& BodyArray();
     
-    const Coords& TailCoords() const;
+    Coords& TailCoords();
     
     
 private:

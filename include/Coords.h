@@ -1,22 +1,28 @@
 #pragma once
-#include "Axis.h"
 #include <iostream>
 using std::ostream;
+
+enum Axis { x, y };
 
 class Coords
 {
   private:
-    int xOrdinate, yOrdinate;
+    int _x, _y;
     
   public:
-    Coords();
-    Coords(const int x, const int y);
-    Coords(const Coords& pos);
+    Coords(int x = 0, int y = 0);
+    Coords(Coords& pos);
 
-    int get(const Axis& ax) const;
+    void setX(int x);
+    void setY(int y);
 
-    void increment(const Axis& ax);
-    void decrement(const Axis& ax);
+    int getX();
+    int getY();
+
+    const int operator()(const Axis& ax);
+
+    Coords operator++(int ax);
+    Coords operator--(int ax);
     
-    friend ostream& operator<<(ostream& os, const Coords& pos);
+    friend ostream& operator<<(ostream& os, Coords& pos);
 };

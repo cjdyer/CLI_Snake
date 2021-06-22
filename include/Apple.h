@@ -1,13 +1,8 @@
 #pragma once
 #include "Coords.h"
 
-class Apple
+class Apple : public Coords
 {
 public:
-    Apple();
-    Apple(const Coords& pos);
-    const Coords& Pos();
-
-private:
-    Coords _pos;
+    Apple(int x = 0, int y = 0);
 };

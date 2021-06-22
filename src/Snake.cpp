@@ -2,57 +2,58 @@
 #include "../include/Coords.h"
 #include "../include/Symbol.h"
 #include "../include/Snake.h"
-#include "../include/Axis.h"
 #include <iostream>
 using std::cout;
 using std::endl;
 
-Snake::Snake()
-    :length(1), headCoords(Coords()), oldHeadCoords(Coords()), headSymbol(Head_Symbol::LookUp), bodySymbol(Body_Symbol::Vertical)
-{/*cout << "constructed empty snake" << endl;*/ }
+Snake::Snake() :length(1), headSymbol(Head_Symbol::LookUp), 
+                bodySymbol(Body_Symbol::Vertical) 
+{
+    headCoords = Coords();
+    oldHeadCoords = Coords();    
+}
 
 Snake::Snake(int x, int y)
-    :length(3), headCoords(Coords(((x+1)/2)-1, ((y + 1) / 2) - 1)), oldHeadCoords(Coords()), headSymbol(Head_Symbol::LookUp), bodySymbol(Body_Symbol::Vertical)
+    :length(3), 
+    oldHeadCoords(Coords()), headSymbol(Head_Symbol::LookUp), bodySymbol(Body_Symbol::Vertical)
 {
+    headCoords = (Coords(((x+1)/2)-1, ((y + 1) / 2) - 1))
     bodyArray.reserve(2);
     bodyArray.push_back(headCoords);
 }
 
-const unsigned int Snake::Length() const
+const unsigned int Snake::Length() 
 { return length; }
 
-const Coords& Snake::HeadCoords() const
+Coords& Snake::HeadCoords() 
 { return headCoords; }
 
-const unsigned int Snake::HeadCoord(const Axis& ax) const
-{ return headCoords.get(ax); }
+const unsigned int Snake::HeadCoord(const Axis& ax)
+{ return headCoords(ax); }
 
-const Coords& Snake::OldHeadCoords() const
+Coords& Snake::OldHeadCoords() 
 { return oldHeadCoords; }
 
-const unsigned int Snake::OldHeadCoord(const Axis& ax) const
-{ return oldHeadCoords.get(ax); }
+const unsigned int Snake::OldHeadCoord(const Axis& ax)
+{ return oldHeadCoords(ax); }
 
-const Head_Symbol& Snake::HeadSymbol() const
+const Head_Symbol& Snake::HeadSymbol() 
 { return headSymbol; }
 
-const Body_Symbol& Snake::BodySymbol() const
+const Body_Symbol& Snake::BodySymbol() 
 { return bodySymbol; }
 
-const vector<Coords>& Snake::BodyArray() const
+const vector<Coords>& Snake::BodyArray() 
 { return bodyArray; }
 
 void Snake::move(const Direction& dir, const Direction& oldDir)
 {
     oldHeadCoords = headCoords;
-    
-//    cout << "move snake ";
 
     switch(dir)
     {
         case Up:
-//            cout << "up" << endl;
-            headCoords.decrement(Axis::y);
+            headCoords--(Axis::y);
             headSymbol = Head_Symbol::LookUp;
             
             updateBody();
@@ -82,8 +83,7 @@ void Snake::move(const Direction& dir, const Direction& oldDir)
             break;
             
         case Down:
-//            cout << "down" << endl;
-            headCoords.increment(Axis::y);
+            headCoords++(Axis::y);
             headSymbol = Head_Symbol::LookDown;
             
             updateBody();
@@ -113,8 +113,7 @@ void Snake::move(const Direction& dir, const Direction& oldDir)
             break;
             
         case Left:
-//            cout << "left" << endl;
-            headCoords.decrement(Axis::x);
+            headCoords--(Axis::x);
             headSymbol = Head_Symbol::LookLeft;
             
             updateBody();
@@ -144,8 +143,7 @@ void Snake::move(const Direction& dir, const Direction& oldDir)
             break;
             
         case Right:
-//            cout << "right" << endl;
-            headCoords.increment(Axis::x);
+            headCoords++(Axis::x);
             headSymbol = Head_Symbol::LookRight;
             
             updateBody();
@@ -186,13 +184,7 @@ void Snake::updateBody()
     tailCoords = bodyArray[length - 1];
     
     bodyArray.erase(bodyArray.begin() + length - 1);
-    
-//    cout << "bodyArray now be looking like: ";
-//    for (const Coords& pos : bodyArray) {
-//        cout << pos << ", ";
-//    }
-//    cout << endl;
 }
 
-const Coords& Snake::TailCoords() const
+Coords& Snake::TailCoords()
 { return tailCoords; }

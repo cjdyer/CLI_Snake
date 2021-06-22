@@ -13,44 +13,45 @@
 
 const char* GetSymbol(const Head_Symbol sym)
 {
+    const char* symbol;
     switch(sym)
     {
        case Head_Symbol::LookUp:
-            return "^";
+            symbol = "^";
             
         case Head_Symbol::LookLeft:
-            return "«";
+            symbol = "«";
             
         case Head_Symbol::LookRight:
-            return "»";
+            symbol = "»";
             
         case Head_Symbol::LookDown:
-            return "¥";
+            symbol = "¥";
     }
-
-    return "You done goofed my friend, this should have been a Head_Symbol, but now its an unfunny error message!";
+    return symbol;
 }
 const char* GetSymbol(const Body_Symbol sym)
 {
+    const char* symbol;
     switch(sym)
     {
         case Body_Symbol::TopLeft:
-            return "╔";
+            symbol = "╔";
             
         case Body_Symbol::TopRight:
-            return "╗";
+            symbol = "╗";
             
         case Body_Symbol::BottomLeft:
-            return "╚";
+            symbol = "╚";
             
         case Body_Symbol::BottomRight:
-            return "╝";
+            symbol = "╝";
             
         case Body_Symbol::Horizontal:
-            return "═";
+            symbol = "═";
             
         case Body_Symbol::Vertical:
-            return "║";
+            symbol = "║";
     }
-    return "You done goofed my friend, this should have been a Body_Symbol, but now its an unfunny error message!";
+    return symbol;
 }

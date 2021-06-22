@@ -18,7 +18,7 @@ int main()
     
     Board<width, height> board;
     Snake snake(width, height);
-    Apple apple({1, 1});
+    Apple apple(1, 1);
     
     Direction dir = None;
     Direction oldDir = None;
